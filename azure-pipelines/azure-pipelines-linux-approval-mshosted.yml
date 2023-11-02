@@ -1,0 +1,59 @@
+resources:
+  repositories:
+    - repository: MoviesAPI
+      type: github
+      endpoint: kolosovpetro
+      name: kolosovpetro/MoviesAPI
+
+trigger:
+  - master
+
+variables:
+  - name: 'vmImageName'
+    value: 'ubuntu-latest'
+
+  - name: 'System.Debug'
+    value: 'true'
+
+  - name: StageName
+    value: 'Linux_MsHosted_Agent_Research_Approval'
+
+stages:
+  - stage: ${{ variables.StageName }}
+    displayName: ${{ variables.StageName }}
+    jobs:
+      - deployment: ${{ variables.StageName }}
+        displayName: ${{ variables.StageName }}
+        pool:
+          vmImage: ${{ variables.vmImageName }}
+        environment: dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: MoviesAPI
+                  fetchDepth: 0
+            
+                - script: |
+                    echo "Agent.BuildDirectory: $(Agent.BuildDirectory)"
+                    ls -lsa $(Agent.BuildDirectory)
+                    echo "Finish print Agent.BuildDirectory"
+                  displayName: 'Print Agent.BuildDirectory'
+            
+                - script: |
+                    echo "System.DefaultWorkingDirectory: $(System.DefaultWorkingDirectory)"
+                    ls -lsa $(System.DefaultWorkingDirectory)
+                    echo "Finish print System.DefaultWorkingDirectory"
+                  displayName: 'Print System.DefaultWorkingDirectory'
+            
+                - script: |
+                    echo "Build.ArtifactStagingDirectory: $(Build.ArtifactStagingDirectory)"
+                    ls -lsa $(Build.ArtifactStagingDirectory)
+                    echo "Finish print Build.ArtifactStagingDirectory"
+                  displayName: 'Print Build.ArtifactStagingDirectory'
+
+                - script: |
+                    echo "Common.TestResultsDirectory: $(Common.TestResultsDirectory)"
+                    ls -lsa $(Common.TestResultsDirectory)
+                    echo "Finish print Common.TestResultsDirectory"
+                  displayName: 'Print Common.TestResultsDirectory'
